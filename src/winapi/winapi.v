@@ -84,6 +84,13 @@ pub struct C.HWINEVENTHOOK {}
 
 pub type WindowClass = C.WNDCLASS
 
+@[typedef]
+pub struct C.POINT {
+	x u32
+	y u32
+}
+
+fn C.GetCursorPos(&C.POINT) u8
 fn C.MessageBoxA(&u8, &u8, &u8, int) int
 fn C.CreateWindowExW(u8, &u8, &u8, u32, int, int, int, int, C.HWND, &u8, C.HINSTANCE, &u8) C.HWND
 fn C.CreateWindowEx(u8, &u8, &u8, u32, int, int, int, int, C.HWND, &u8, C.HINSTANCE, &u8) C.HWND

@@ -24,10 +24,8 @@ fn get_monitor_by_win(hwnd C.HWND, state &model.State) !model.Monitor {
 
 fn add_win(hwnd C.HWND, state &model.State) !bool {
 	// check if exists window
-	for win in state.windows {
-		if win.ptr == hwnd {
-			return false
-		}
+	if state.window_workarea[hwnd.str()] != '' {
+		return false
 	}
 
 	len := 1024

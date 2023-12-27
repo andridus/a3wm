@@ -50,11 +50,10 @@ pub mut:
 
 pub struct State {
 pub mut:
-	handler         C.HWND
-	shellhookid     u32
-	grid            map[string][][]int
+	handler     C.HWND
+	shellhookid u32
+	grid        map[string][][]int
 	// [id_workarea][window_id][left, top, width, height]
-	windows         []Window
 	window_workarea map[string]string
 	workareas       map[string]Workarea
 	monitors        map[string]Monitor
@@ -82,6 +81,7 @@ pub fn (windows []Window) get_actives() []Window {
 			wins << w
 		}
 	}
+	wins.sort(a.position < b.position)
 	return wins
 }
 
@@ -100,9 +100,11 @@ pub fn (mut state State) end_window_resizing(hwnd C.HWND, rect C.RECT) {
 }
 
 fn update_grid_for_workarea(state &State, position int, workarea_reference string, rect C.RECT) [][]int {
+	mut state0 := unsafe { &state }
 	old_grid := unsafe { state.grid[workarea_reference] }
 	workarea := unsafe { state.workareas[workarea_reference] }
 	total_in_workarea := workarea.windows.count_active() - 1
+
 	mut ng := [][]int{}
 	old_left := old_grid[position][0]
 	old_width := old_grid[position][2]
@@ -113,10 +115,11 @@ fn update_grid_for_workarea(state &State, position int, workarea_reference strin
 	delta_right := math.abs(old_right - rect.right)
 	delta_left := math.abs(old_left - rect.left)
 	if delta_right > 2 && delta_left > 2 {
-		direction = 'NOOP'
+		direction = 'MOVE'
 	} else if delta_right > 2 {
 		direction = 'RIGHT'
 	}
+
 	match direction {
 		'LEFT' {
 			if position == 0 {
@@ -152,6 +155,21 @@ fn update_grid_for_workarea(state &State, position int, workarea_reference strin
 				}
 			}
 		}
+		'MOVE' {
+			cursor_point := C.POINT{}
+			if C.GetCursorPos(&cursor_point) == 1 {
+				println('Cursor position: (${cursor_point.x}, ${cursor_point.y})')
+				for i, og in old_grid {
+					if i != position {
+						if cursor_point.x > og[0] && cursor_point.x < (og[0] + og[2]) {
+							println('deve substituir ${i} por ${position} e ${position} por ${i}')
+							state0.swap_window_position(position, i)
+						}
+					}
+				}
+			}
+			return old_grid
+		}
 		else {
 			return old_grid
 		}
@@ -175,6 +193,35 @@ pub fn (mut state State) inactivate_window(hwnd C.HWND) {
 			if w.ptr == hwnd {
 				w.active = false
 			}
+		}
+	}
+}
+
+pub fn (mut state State) swap_window_position(from int, to int) {
+	for _, mut wa in state.workareas {
+		for mut w in wa.windows {
+			if from < to {
+				if w.position == from && w.active {
+					w.position = to
+				} else if w.position == to && w.active {
+					w.position = from
+				}
+			}
+			if from > to {
+				if w.position == to && w.active {
+					w.position = from
+				} else if w.position == from && w.active {
+					w.position = to
+				}
+			}
+		}
+	}
+}
+
+pub fn (state &State) debug_windows() {
+	for _, work in state.workareas {
+		for w in work.windows {
+			println('[${w.active}] [${work.idx}] [${w.position}] ${w.title}')
 		}
 	}
 }
