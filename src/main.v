@@ -3,6 +3,7 @@ module main
 import core
 
 #include <windows.h>
+#flag -lgdi32
 
 fn main() {
 	instance := C.GetModuleHandleA(unsafe { nil })

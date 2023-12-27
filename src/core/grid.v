@@ -3,7 +3,7 @@ module core
 import model
 
 fn render_grid(state &model.State) {
-	state.debug_windows()
+	// state.debug_windows()
 	if state.grid.len == 0 {
 		update_grid(state)
 	}

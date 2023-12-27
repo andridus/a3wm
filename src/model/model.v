@@ -158,11 +158,9 @@ fn update_grid_for_workarea(state &State, position int, workarea_reference strin
 		'MOVE' {
 			cursor_point := C.POINT{}
 			if C.GetCursorPos(&cursor_point) == 1 {
-				println('Cursor position: (${cursor_point.x}, ${cursor_point.y})')
 				for i, og in old_grid {
 					if i != position {
 						if cursor_point.x > og[0] && cursor_point.x < (og[0] + og[2]) {
-							println('deve substituir ${i} por ${position} e ${position} por ${i}')
 							state0.swap_window_position(position, i)
 						}
 					}
@@ -199,22 +197,18 @@ pub fn (mut state State) inactivate_window(hwnd C.HWND) {
 
 pub fn (mut state State) swap_window_position(from int, to int) {
 	for _, mut wa in state.workareas {
+		mut i := 0
 		for mut w in wa.windows {
-			if from < to {
-				if w.position == from && w.active {
+			if w.active {
+				if i == from {
 					w.position = to
-				} else if w.position == to && w.active {
+				} else if i == to {
 					w.position = from
 				}
-			}
-			if from > to {
-				if w.position == to && w.active {
-					w.position = from
-				} else if w.position == from && w.active {
-					w.position = to
-				}
+				i++
 			}
 		}
+		wa.windows.sort(a.position < b.position)
 	}
 }
 

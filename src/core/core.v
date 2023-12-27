@@ -15,7 +15,7 @@ pub fn main(instance C.HINSTANCE, cmd_show int) int {
 	}, 0, 0, C.WINEVENT_OUTOFCONTEXT)
 
 	classname := wchar.from_string('Sample Window Class')
-	title := wchar.from_string('Learn to Program Windows')
+	title := wchar.from_string('A3 Window Manager')
 	shellhook := wchar.from_string('SHELLHOOK')
 	wc := winapi.WindowClass{
 		lpfnWndProc: window_proc
