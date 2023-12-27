@@ -36,6 +36,7 @@ fn window_proc(hwnd C.HWND, umsg int, wparam C.WPARAM, lparam C.HWND) C.LRESULT 
 							render_grid(state)
 						}
 					}
+
 					// C.HSHELL_ACTIVATESHELLWINDOW { println('HSHELL_ACTIVATESHELLWINDOW')}
 					// C.HSHELL_WINDOWACTIVATED {
 					// 	println('HSHELL_WINDOWACTIVATED')
@@ -51,6 +52,9 @@ fn window_proc(hwnd C.HWND, umsg int, wparam C.WPARAM, lparam C.HWND) C.LRESULT 
 					// C.HSHELL_APPCOMMAND { println('HSHELL_APPCOMMAND')}
 					// C.HSHELL_WINDOWREPLACED { println('HSHELL_WINDOWREPLACED')}
 					// C.HSHELL_WINDOWREPLACING { println('HSHELL_WINDOWREPLACING')}
+					C.WM_KEYDOWN {
+						println("KEY DOWN")
+					}
 					else {}
 				}
 			}

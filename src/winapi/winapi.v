@@ -3,6 +3,7 @@ module winapi
 import model
 
 type C.WPARAM = u32
+type C.LPARAM = u32
 
 @[typedef]
 pub struct C.RECT {
@@ -42,7 +43,14 @@ pub struct C.HDC {}
 pub struct C.HBRUSH {}
 
 @[typedef]
-pub struct C.MSG {}
+pub struct C.MSG {
+	hwnd C.HWND
+	message u32
+	wParam C.WPARAM
+	lParam C.LPARAM
+	time   u32
+	pt     C.POINT
+}
 
 pub type Msg = C.MSG
 
@@ -121,6 +129,7 @@ fn C.GetWindowRect(C.HWND, &C.RECT)
 fn C.DestroyWindow(C.HWND) int
 fn C.GetWindowLongPtr(C.HWND, int) &model.State
 fn C.MoveWindow(C.HWND, int, int, int, int, int) int
+fn C.RegisterHotKey(C.HWND, int, u32, u32) int
 
 fn C.MonitorFromWindow(C.HWND, int) C.HMONITOR
 fn C.GetMonitorInfo(C.HMONITOR, &C.MONITORINFOEX)
@@ -136,15 +145,3 @@ fn C.UnhookWindowsHookExA(C.HHOOK)
 fn C.GetLastError() u32
 fn C.SetWinEventHook(int, int, &u8, fn (int, C.WPARAM, C.HWND) C.HHOOK, int, int, int) C.HWINEVENTHOOK
 fn C.UnhookWinEvent(C.HWINEVENTHOOK)
-
-// fn window_watcher(handler C.HWND, state &State) int {
-// 	// monitor := C.HMONITOR{}
-// 	// monitor_info := C.MONITORINFOEX{}
-// 	_ := window_watcher_handler(state, handler)
-// 	return 1
-// }
-
-// fn window_watcher_handler(state &State, handler C.HWND) int {
-// 	add_win(handler, state)
-// 	return 0
-// }

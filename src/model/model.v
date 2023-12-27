@@ -6,6 +6,15 @@ pub const monitor_display_1 = '\\\\.\\DISPLAY1'
 pub const monitor_display_2 = '\\\\.\\DISPLAY2'
 pub const classes = ['Windows.UI.Core.CoreWindow', 'ApplicationFrameWindow']
 
+pub enum WindowPosition {
+	horizontal
+	vertical
+}
+pub enum DragDirection {
+	left
+	right
+	move
+}
 pub struct Rect {
 pub:
 	top    int
@@ -58,6 +67,12 @@ pub mut:
 	workareas       map[string]Workarea
 	monitors        map[string]Monitor
 	current_window  ?C.HWND
+	next_window_position WindowPosition = .horizontal
+}
+
+pub fn (state &State) set_next_window_to(pos WindowPosition) {
+	mut state0 := unsafe { &state }
+	state0.next_window_position = pos
 }
 
 pub fn (state &State) get_monitor_by_id(id string) Monitor {
@@ -95,11 +110,11 @@ pub fn (mut state State) end_window_resizing(hwnd C.HWND, rect C.RECT) {
 			break
 		}
 	}
-	state.grid[workarea_reference] = update_grid_for_workarea(state, position, workarea_reference,
+	state.grid[workarea_reference] = state.update_grid_for_workarea(position, workarea_reference,
 		rect)
 }
 
-fn update_grid_for_workarea(state &State, position int, workarea_reference string, rect C.RECT) [][]int {
+fn (state &State) update_grid_for_workarea(position int, workarea_reference string, rect C.RECT) [][]int {
 	mut state0 := unsafe { &state }
 	old_grid := unsafe { state.grid[workarea_reference] }
 	workarea := unsafe { state.workareas[workarea_reference] }
@@ -111,17 +126,17 @@ fn update_grid_for_workarea(state &State, position int, workarea_reference strin
 	old_right := old_left + old_width
 	new_width := rect.right - rect.left
 	delta_width := old_width - new_width
-	mut direction := 'LEFT'
+	mut direction := DragDirection.left
 	delta_right := math.abs(old_right - rect.right)
 	delta_left := math.abs(old_left - rect.left)
 	if delta_right > 2 && delta_left > 2 {
-		direction = 'MOVE'
+		direction = .move
 	} else if delta_right > 2 {
-		direction = 'RIGHT'
+		direction = .right
 	}
 
 	match direction {
-		'LEFT' {
+		.left {
 			if position == 0 {
 				return old_grid
 			}
@@ -138,7 +153,7 @@ fn update_grid_for_workarea(state &State, position int, workarea_reference strin
 				}
 			}
 		}
-		'RIGHT' {
+		.right {
 			if position == total_in_workarea {
 				return old_grid
 			}
@@ -155,7 +170,7 @@ fn update_grid_for_workarea(state &State, position int, workarea_reference strin
 				}
 			}
 		}
-		'MOVE' {
+		.move {
 			cursor_point := C.POINT{}
 			if C.GetCursorPos(&cursor_point) == 1 {
 				for i, og in old_grid {
@@ -166,9 +181,6 @@ fn update_grid_for_workarea(state &State, position int, workarea_reference strin
 					}
 				}
 			}
-			return old_grid
-		}
-		else {
 			return old_grid
 		}
 	}
