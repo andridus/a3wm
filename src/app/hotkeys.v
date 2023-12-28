@@ -1,6 +1,8 @@
-module core
+module app
+
 import winapi
-import model
+import core
+
 fn register_hotkeys() {
 	// Register Hot Key
 	// Follow the https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
@@ -10,7 +12,7 @@ fn register_hotkeys() {
 	register_one_hotkey(2, winapi.Key.mod_alt, winapi.Key.key_v)
 }
 
-fn map_hotkeys(msg &C.MSG, state &model.State) {
+fn map_hotkeys(msg &C.MSG, state &core.State) {
 	if msg.message == C.WM_HOTKEY {
 		match int(msg.wParam) {
 			1 { callback_set_next_window_to_horizontal(state) }
@@ -20,10 +22,10 @@ fn map_hotkeys(msg &C.MSG, state &model.State) {
 	}
 }
 
-fn register_one_hotkey(code int, modifier winapi.Key, key winapi.Key){
-	if C.RegisterHotKey(unsafe {nil}, code, u32(modifier), u32(key)) == 1 {
-		println('Hotkey \'${modifier}+${key}\' registered' )
+fn register_one_hotkey(code int, modifier winapi.Key, key winapi.Key) {
+	if C.RegisterHotKey(unsafe { nil }, code, u32(modifier), u32(key)) == 1 {
+		core.debug('Hotkey \'${modifier}+${key}\' registered')
 	} else {
-		println('ERROR: Hotkey \'${modifier}+${key}\' was not possible' )
+		core.debug('ERROR: Hotkey \'${modifier}+${key}\' was not possible')
 	}
 }

@@ -1,6 +1,6 @@
 module winapi
 
-import model
+import core
 
 type C.WPARAM = u32
 type C.LPARAM = u32
@@ -44,12 +44,12 @@ pub struct C.HBRUSH {}
 
 @[typedef]
 pub struct C.MSG {
-	hwnd C.HWND
+	hwnd    C.HWND
 	message u32
-	wParam C.WPARAM
-	lParam C.LPARAM
-	time   u32
-	pt     C.POINT
+	wParam  C.WPARAM
+	lParam  C.LPARAM
+	time    u32
+	pt      C.POINT
 }
 
 pub type Msg = C.MSG
@@ -117,7 +117,7 @@ fn C.LoadIconW(C.HINSTANCE, int) C.HICON
 fn C.RegisterShellHookWindow(C.HWND) bool
 fn C.RegisterWindowMessageW(&u8) u32
 fn C.SetWindowLongPtr(C.HWND, int, &u8)
-fn C.EnumWindows(fn (C.HWND, &model.State) int, &u8) int
+fn C.EnumWindows(fn (C.HWND, &core.State) int, &u8) int
 fn C.GetParent(C.HWND) C.HWND
 fn C.GetWindowText(C.HWND, &u8, int)
 fn C.GetClassName(C.HWND, &u8, int)
@@ -127,13 +127,13 @@ fn C.GetWindowLong(C.HWND, int) int
 fn C.GetWindow(C.HWND, int) int
 fn C.GetWindowRect(C.HWND, &C.RECT)
 fn C.DestroyWindow(C.HWND) int
-fn C.GetWindowLongPtr(C.HWND, int) &model.State
+fn C.GetWindowLongPtr(C.HWND, int) &core.State
 fn C.MoveWindow(C.HWND, int, int, int, int, int) int
 fn C.RegisterHotKey(C.HWND, int, u32, u32) int
 
 fn C.MonitorFromWindow(C.HWND, int) C.HMONITOR
 fn C.GetMonitorInfo(C.HMONITOR, &C.MONITORINFOEX)
-fn C.EnumDisplayMonitors(&C.HDC, &C.RECT, fn (C.HMONITOR, C.HDC, &C.RECT, &model.State) int, &u8)
+fn C.EnumDisplayMonitors(&C.HDC, &C.RECT, fn (C.HMONITOR, C.HDC, &C.RECT, &core.State) int, &u8)
 
 fn C.SetWindowsHookEx(int, fn (int, C.WPARAM, C.HWND) C.HHOOK, C.HINSTANCE, &u8) C.HHOOK
 fn C.SetWindowsHookExA(int, fn (int, C.WPARAM, C.HWND) C.HHOOK, C.HINSTANCE, &u8) C.HHOOK

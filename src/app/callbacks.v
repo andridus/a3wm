@@ -1,10 +1,10 @@
-module core
+module app
 
 import builtin.wchar
-import model
+import core
 import rand
 
-fn get_monitor_callback(wmonitor C.HMONITOR, hdc C.HDC, rect &C.RECT, state &model.State) int {
+fn get_monitor_callback(wmonitor C.HMONITOR, hdc C.HDC, rect &C.RECT, state &core.State) int {
 	mut state0 := unsafe { &state }
 	monitor_info := C.MONITORINFOEX{
 		cbSize: sizeof(C.MONITORINFOEX)
@@ -13,16 +13,16 @@ fn get_monitor_callback(wmonitor C.HMONITOR, hdc C.HDC, rect &C.RECT, state &mod
 	monitor_name := unsafe {
 		wchar.to_string(monitor_info.szDevice)
 	}
-	monitor := model.Monitor{
+	monitor := core.Monitor{
 		name: monitor_name
 		id: rand.uuid_v4()
-		size: model.Rect{
+		size: core.Rect{
 			top: monitor_info.rcMonitor.top
 			left: monitor_info.rcMonitor.left
 			width: monitor_info.rcMonitor.right - monitor_info.rcMonitor.left
 			height: monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top
 		}
-		workarea: model.Rect{
+		workarea: core.Rect{
 			top: monitor_info.rcWork.top
 			left: monitor_info.rcWork.left
 			width: monitor_info.rcWork.right - monitor_info.rcWork.left
@@ -33,7 +33,7 @@ fn get_monitor_callback(wmonitor C.HMONITOR, hdc C.HDC, rect &C.RECT, state &mod
 	return 1
 }
 
-fn window_watcher_callback(handler C.HWND, state &model.State) int {
-	add_win(handler, state) or { println('error: ${err.str()}') }
+fn window_watcher_callback(handler C.HWND, state &core.State) int {
+	add_win(handler, state) or { core.debug('error: ${err.str()}') }
 	return 1
 }

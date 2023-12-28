@@ -1,6 +1,7 @@
 module winapi
+
 pub enum Key {
-	key_0 = 0x30
+	key_0        = 0x30
 	key_1
 	key_2
 	key_3
@@ -10,7 +11,7 @@ pub enum Key {
 	key_7
 	key_8
 	key_9
-	key_a = 0x41
+	key_a        = 0x41
 	key_b
 	key_c
 	key_d
@@ -36,10 +37,10 @@ pub enum Key {
 	key_x
 	key_y
 	key_z
-	mod_alt = 0x0001
-	mod_control = 0x0002
-	mod_shift = 0x0003
-	mod_win = 0x0008
+	mod_alt      = 0x0001
+	mod_control  = 0x0002
+	mod_shift    = 0x0003
+	mod_win      = 0x0008
 	mod_norepeat = 0x4000
 }
 

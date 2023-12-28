@@ -1,21 +1,20 @@
-module core
+module app
 
 import builtin.wchar
 import winapi
-import model
+import core
 
-// , prev_instance C.HINSTANCE, cmd_line &u8,
-pub fn main(instance C.HINSTANCE, cmd_show int) int {
-	mut state := model.State{}
+pub fn entrypoint(instance C.HINSTANCE, cmd_show int) int {
+	mut state := core.State{}
 	ref_state := &state
 
 	register_hotkeys()
 
-	if C.RegisterHotKey(unsafe {nil}, 1, C.MOD_ALT, 0x48) == 1 {
-		println('Hotkey \'ALT+h\' registered, using MOD_NOREPEAT flag\n' )
+	if C.RegisterHotKey(unsafe { nil }, 1, C.MOD_ALT, 0x48) == 1 {
+		core.debug("Hotkey 'ALT+h' registered, using MOD_NOREPEAT flag\n")
 	}
-	if C.RegisterHotKey(unsafe {nil}, 2, C.MOD_ALT, 0x56) == 1 {
-		println('Hotkey \'ALT+v\' registered, using MOD_NOREPEAT flag\n' )
+	if C.RegisterHotKey(unsafe { nil }, 2, C.MOD_ALT, 0x56) == 1 {
+		core.debug("Hotkey 'ALT+v' registered, using MOD_NOREPEAT flag\n")
 	}
 
 	// window hook to get any resized window
@@ -50,15 +49,13 @@ pub fn main(instance C.HINSTANCE, cmd_show int) int {
 	C.SetWindowLongPtr(hwnd, C.GWLP_USERDATA, &state)
 	state.handler = hwnd
 
-	// windows := state.windows_by_monitor(monitor_display_1)
 	C.EnumWindows(window_watcher_callback, &state)
-	render_grid(state)
+	render_grid(&state)
 	msg := C.MSG{}
 	for C.GetMessage(&msg, unsafe { nil }, 0, 0) > 0 {
 		map_hotkeys(&msg, &state)
 		C.TranslateMessage(&msg)
 		C.DispatchMessage(&msg)
-
 	}
 
 	C.UnhookWinEvent(g_hook)

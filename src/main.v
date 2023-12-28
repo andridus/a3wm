@@ -1,6 +1,6 @@
 module main
 
-import core
+import app
 
 #include <windows.h>
 #flag -lgdi32
@@ -8,5 +8,5 @@ import core
 fn main() {
 	instance := C.GetModuleHandleA(unsafe { nil })
 	cmd_show := 1
-	core.main(instance, cmd_show)
+	app.entrypoint(instance, cmd_show)
 }
