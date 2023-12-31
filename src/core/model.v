@@ -21,11 +21,16 @@ pub:
 	left   int
 	width  int
 	height int
+	valid bool = true
 }
 
 
 pub fn (r Rect) str() string {
-	return '(${r.left}, ${r.top}, ${r.width}, ${r.height})'
+	if r.valid {
+		return '{L: ${r.left}, T: ${r.top}, W: ${r.width}, H: ${r.height}}'
+	} else {
+		return 'invalid rect'
+	}
 }
 
 pub fn (r Rect) to_list_int() []int {
@@ -44,6 +49,12 @@ pub:
 	workarea Rect
 }
 
+pub struct FullscreenWindow {
+	hwnd string
+	rect []int
+	valid bool
+}
+
 pub struct Workarea {
 pub:
 	uuid 			string
@@ -53,6 +64,7 @@ pub:
 	active    bool
 pub mut:
 	windows []&Window
+	fullscreen FullscreenWindow
 	grid_idx   string
 }
 
@@ -60,6 +72,16 @@ pub fn (w &Workarea) set_grid(grid_id string) {
 	mut w0 := unsafe { &w}
 	w0.grid_idx = grid_id
 }
+pub fn (w &Workarea) set_fullscreen(grid &Grid, window_address string, monitor Monitor) {
+	mut w0 := unsafe { &w}
+	rect := monitor.workarea
+	w0.fullscreen = FullscreenWindow{valid: true, hwnd: window_address, rect: [rect.left, rect.top, rect.width, rect.height]}
+}
+pub fn (w &Workarea) unset_fullscreen() {
+	mut w0 := unsafe { &w}
+	w0.fullscreen = FullscreenWindow{valid: false}
+}
+
 
 pub struct Window {
 pub:

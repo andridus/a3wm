@@ -6,7 +6,7 @@ fn render_grid(state &core.State) {
 	if state.render_grid.len == 0 {
 		state.update_render_grid()
 	}
-	state.debug()
+	// state.debug()
 	for _, grid in state.render_grid {
 		for hwnd_str, rect in grid {
 			ptr := unsafe {state.windows[hwnd_str].ptr}

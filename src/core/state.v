@@ -76,10 +76,14 @@ pub fn (state &State) get_monitor_by_id(id string) Monitor {
 	return state.monitors[id]
 }
 
+pub fn (state &State) start_window_resizing(hwnd C.HWND, rect C.RECT) {
+	// grid := state.get_grid_by_hwnd(hwnd.str()) or { return }
+	// el := grid.which_elem_position(hwnd.str())
+}
 pub fn (state &State) end_window_resizing(hwnd C.HWND, rect C.RECT) {
 	if state.grids.len == 0 { return }
 	grid := state.get_grid_by_hwnd(hwnd.str()) or { return }
-	match grid.parse_axis(rect, hwnd) {
+	match grid.parse_axis(rect, hwnd, state) {
 		.nothing { }
 		.drag_axis { }
 		.swap_window {
@@ -107,27 +111,20 @@ pub fn (state &State) get_window_by_mouse_position(point C.POINT) !C.HWND {
 }
 fn (state &State) get_window_by_mouse_position_deep_grid(grid &Grid, point C.POINT) (bool, string) {
 	if grid.rect.has_point(point) {
-		match grid.direction {
-			.horizontal {
-				if grid.all_actives() {
-					rect_elem1 :=  grid.get_elem_rect_for1()
-					rect_elem2 :=  grid.get_elem_rect_for2()
-					if rect_elem1.has_point(point) {
-						return state.get_window_by_mouse_position_deep(grid.elem1, point)
-					} else if rect_elem2.has_point(point) {
-						return state.get_window_by_mouse_position_deep(grid.elem2, point)
-					}
-				} else {
-					if grid.active1 {
-						return state.get_window_by_mouse_position_deep(grid.elem1, point)
-					}
-					else if grid.active2 {
-						return state.get_window_by_mouse_position_deep(grid.elem2, point)
-					}
-				}
+		if grid.all_actives() {
+			rect_elem1 :=  grid.get_elem_rect_for1()
+			rect_elem2 :=  grid.get_elem_rect_for2()
+			if rect_elem1.has_point(point) {
+				return state.get_window_by_mouse_position_deep(grid.elem1, point)
+			} else if rect_elem2.has_point(point) {
+				return state.get_window_by_mouse_position_deep(grid.elem2, point)
 			}
-			.vertical {
-
+		} else {
+			if grid.active1 {
+				return state.get_window_by_mouse_position_deep(grid.elem1, point)
+			}
+			else if grid.active2 {
+				return state.get_window_by_mouse_position_deep(grid.elem2, point)
 			}
 		}
 	}
@@ -174,12 +171,17 @@ pub fn (state &State) update_render_grid() {
 	mut state0 := unsafe {&state}
 	for _, ws in state.workareas {
 		mut rets := map[string][]int{}
-		grid := state.get_grid_by_uuid(ws.grid_idx)
-		rects0 := grid.get_deep_rects(state) or {
-			debug(err.msg())
-			return }
-		for hwnd, r in rects0 {
-			rets[hwnd] = r
+		if ws.fullscreen.valid {
+			rets[ws.fullscreen.hwnd	] = ws.fullscreen.rect
+		}else{
+			grid := state.get_grid_by_uuid(ws.grid_idx)
+			rects0 := grid.get_deep_rects(state) or {
+				debug(err.msg())
+				return }
+			for hwnd, r in rects0 {
+				rets[hwnd] = r
+			}
+
 		}
 		debug('rendered')
 		state0.render_grid[ws.uuid] = rets.move()
@@ -213,22 +215,55 @@ pub fn (state &State) swap_window_position(current C.HWND, target C.HWND) {
 
 	mut gd1 := state.get_grid_by_hwnd(current.str()) or { return }
 	mut gd2 := state.get_grid_by_hwnd(target.str()) or { return }
-	pos1 := gd1.which_elem_window(current)
-	pos2 := gd2.which_elem_window(target)
+	pos1 := gd1.which_elem_position(current.str())
+	pos2 := gd2.which_elem_position(target.str())
 	gd1.replace_window(pos1, target)
 	gd2.replace_window(pos2, current)
 }
+pub fn (state &State) toggle_grid_direction() {
+	// get hwnd by mouse position
+	cursor_point := C.POINT{}
+	if C.GetCursorPos(&cursor_point) == 1 {
+		hwnd := state.get_window_by_mouse_position(cursor_point) or {
+			return
+		}
+		mut grid := state.get_grid_by_hwnd(hwnd.str()) or { return }
+		grid.toggle_direction()
+		state.replace_grid(grid)
+		state.update_render_grid()
+	}
+}
+
+pub fn (state &State) set_window_to_fullscreen() {
+	hwnd :=C.GetForegroundWindow()
+	if hwnd == 0x0 {
+		return 
+	}
+	mut grid := state.get_grid_by_hwnd(hwnd.str()) or { return }
+	wa := state.get_workarea_by_grid(grid.uuid) or {return}
+	if wa.fullscreen.valid {
+		wa.unset_fullscreen()
+	} else {
+		monitor := state.monitors[wa.monitor]
+		wa.set_fullscreen(grid, hwnd.str(), monitor)
+	}
+	state.replace_workarea(wa)
+	state.update_render_grid()
+}
 
 pub fn (state &State) debug() {
-	println('--------------GRIDS (${state.grids.len})-------------------')
-	println(state.grids)
-	println('--------------WINDOWS-GRIDS (${state.windows_grid.len})-------------------')
-	println(state.windows_grid)
-	println('--------------WORKAREA (${state.workareas.len})-------------------')
-	println(state.workareas)
-	println('--------------WINDOWS (${state.windows.len})-------------------')
-	println(state.windows)
-	println('--------------RENDER (${state.render_grid.len})-------------------')
-	println(state.render_grid)
-	println('---------------------------------')
+	// clear_screen()
+	dump(state.workareas)
+	for k, g in state.render_grid {
+		println('\nworkarea: $k')
+		for k0, g0 in g {
+			win := unsafe { state.windows[k0] }
+			title := win.title.substr_with_check(0,14) or {
+				win.title.substr(0,win.title.len)
+			}
+			s := '{L: ${g0[0]}   T: ${g0[1]}   W: ${g0[2]}   H: ${g0[3]}}'
+			println('\t${title} ${s}')
+		}
+	}
 }
+

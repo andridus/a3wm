@@ -145,3 +145,6 @@ fn C.UnhookWindowsHookExA(C.HHOOK)
 fn C.GetLastError() u32
 fn C.SetWinEventHook(int, int, &u8, fn (int, C.WPARAM, C.HWND) C.HHOOK, int, int, int) C.HWINEVENTHOOK
 fn C.UnhookWinEvent(C.HWINEVENTHOOK)
+// fn C.GetActiveWindow() C.HWND
+fn C.GetForegroundWindow() C.HWND
+fn C.SetActiveWindow(C.HWND) C.HWND

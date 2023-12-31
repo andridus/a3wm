@@ -1,6 +1,10 @@
 module winapi
 
 pub enum Key {
+	key_left	 = 0x25
+	key_up  	 = 0x26
+	key_right  	 = 0x27
+	key_down  	 = 0x28
 	key_0        = 0x30
 	key_1
 	key_2
@@ -42,10 +46,15 @@ pub enum Key {
 	mod_shift    = 0x0003
 	mod_win      = 0x0008
 	mod_norepeat = 0x4000
+
 }
 
 fn (k Key) str() string {
 	return match k {
+		.key_up { 'UP' }
+		.key_down { 'DOWN' }
+		.key_left { 'LEFT' }
+		.key_right { 'RIGHT' }
 		.key_0 { '0' }
 		.key_1 { '1' }
 		.key_2 { '2' }
@@ -87,5 +96,6 @@ fn (k Key) str() string {
 		.mod_shift { 'SHIFT' }
 		.mod_win { 'SUPER' }
 		.mod_norepeat { 'NOREPEAT' }
+
 	}
 }

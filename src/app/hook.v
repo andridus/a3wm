@@ -14,6 +14,12 @@ fn window_hook(ncode int, wparam C.WPARAM, hwnd C.HWND, state &core.State) C.HHO
 			state.update_render_grid()
 			render_grid(state)
 		}
+		C.EVENT_SYSTEM_MOVESIZESTART {
+			rect := C.RECT{}
+			C.GetWindowRect(hwnd, &rect)
+			state.start_window_resizing(hwnd, rect)
+			// render_grid(state)
+		}
 		C.EVENT_SYSTEM_MOVESIZEEND {
 			rect := C.RECT{}
 			C.GetWindowRect(hwnd, &rect)

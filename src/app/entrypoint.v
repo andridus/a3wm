@@ -9,14 +9,6 @@ pub fn entrypoint(instance C.HINSTANCE, cmd_show int) int {
 	ref_state := &state
 
 	register_hotkeys()
-
-	if C.RegisterHotKey(unsafe { nil }, 1, C.MOD_ALT, 0x48) == 1 {
-		core.debug("Hotkey 'ALT+h' registered, using MOD_NOREPEAT flag\n")
-	}
-	if C.RegisterHotKey(unsafe { nil }, 2, C.MOD_ALT, 0x56) == 1 {
-		core.debug("Hotkey 'ALT+v' registered, using MOD_NOREPEAT flag\n")
-	}
-
 	// window hook to get any resized window
 	g_hook := C.SetWinEventHook(C.EVENT_MIN, C.EVENT_MAX, unsafe { nil }, fn [ref_state] (ncode int, wparam C.WPARAM, hwnd C.HWND) C.HHOOK {
 		return window_hook(ncode, wparam, hwnd, ref_state)

@@ -8,16 +8,19 @@ It still has a lot of bugs, but we'll keep moving forward.
  - [x] adjust window side by side horizontally
  - [x] swap window position with other window
  - [x] attach new window to current grid horizontally
- - [] adjust window side by side vertically
+ - [x] adjust window side by side vertically
  - [] attach new window to current grid vertically
  - [] add new window anywhere
  - [] drag and put window anywhere
- - [] change grid direction
- - [] set/unset window fullscreen
+ - [x] change grid direction
+ - [x] set/unset window fullscreen
+ - [] move between windows
  - [] create other workspaces
  - [] send window to other workspaces
  - [] add config file
 
+## Keyboard Shortcuts
+ ALT+t : toggle window direction (mouse pointer over)
 
 ## Example
 ![me](./images/a3wm.gif)
