@@ -5,7 +5,7 @@ import winapi
 import core
 
 pub fn entrypoint(instance C.HINSTANCE, cmd_show int) int {
-	mut state := &core.State{}
+	mut state := &core.State{instance: instance}
 
 	register_hotkeys()
 	// window hook to get any resized window
@@ -24,20 +24,22 @@ pub fn entrypoint(instance C.HINSTANCE, cmd_show int) int {
 		hCursor: C.LoadCursorW(unsafe { nil }, 32512)
 	}
 	C.RegisterClass(&wc)
-	hwnd := C.CreateWindowEx(0, classname, title, C.WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, unsafe { nil },
+
+	hwnd := C.CreateWindowEx(state.get_window_attrs(), classname, title,  C.WS_POPUP , 0, 0, 0, state.get_topbar_size(), unsafe { nil },
 		0x0, instance, 0x0)
 
 	if hwnd == unsafe { nil } {
 		return 0
 	}
 
-	C.ShowWindow(hwnd, C.SW_HIDE)
+	C.ShowWindow(hwnd, state.get_show_window(cmd_show))
 	C.RegisterShellHookWindow(hwnd)
 	state.shellhookid = C.RegisterWindowMessageW(shellhook)
 	C.SetWindowLongPtr(hwnd, C.GWLP_USERDATA, state)
 	state.handler = hwnd
 
 	state.setup_state(hwnd, get_monitor_callback, window_watcher_callback)
+	state.setup_topbar()
 
   nid := create_a_notify_icon(hwnd)
 	msg := C.MSG{}

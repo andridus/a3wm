@@ -1,5 +1,18 @@
 module core
 
+pub fn (state &State) setup_topbar() {
+	mut monitor_rect := Rect{}
+	for _, monitor in state.monitors {
+		if monitor.size.left == 0 {
+			monitor_rect = monitor.size
+		}
+	}
+	C.MoveWindow(state.handler, monitor_rect.left, monitor_rect.top, monitor_rect.width, 50, 1)
+	// RedrawWindow(hWnd, NULL, 0, RDW_INVALIDATE |  RDW_ERASE);
+
+	C.UpdateWindow(state.handler)
+}
+
 fn (state &State) clear_state() {
 		mut state0 := unsafe { state }
 		state0.windows.clear()

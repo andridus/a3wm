@@ -70,6 +70,10 @@ pub type Msg = C.MSG
 pub struct C.HINSTANCE {}
 
 @[typedef]
+pub struct C.COLORREF {}
+
+
+@[typedef]
 pub struct C.HMONITOR {}
 
 @[typedef]
@@ -116,6 +120,7 @@ fn C.GetCursorPos(&C.POINT) u8
 fn C.MessageBoxA(&u8, &u8, &u8, int) int
 fn C.CreateWindowExW(u8, &u8, &u8, u32, int, int, int, int, C.HWND, &u8, C.HINSTANCE, &u8) C.HWND
 fn C.CreateWindowEx(u8, &u8, &u8, u32, int, int, int, int, C.HWND, &u8, C.HINSTANCE, &u8) C.HWND
+fn C.CreateWindow(&u8, &u8, u32, int, int, int, int, C.HWND, &u8, C.HINSTANCE, &u8) C.HWND
 fn C.ShowWindow(C.HWND, int)
 fn C.RegisterClass(&C.WNDCLASS)
 fn C.DefWindowProcW(C.HWND, int, C.WPARAM, C.HWND) C.LRESULT
@@ -125,12 +130,13 @@ fn C.TranslateMessage(&C.MSG)
 fn C.DispatchMessage(&C.MSG)
 fn C.BeginPaint(C.HWND, &C.PAINTSTRUCT) C.HDC
 fn C.EndPaint(C.HWND, &C.PAINTSTRUCT) C.HDC
-fn C.FillRect(C.HDC, &u8, Color)
+fn C.FillRect(C.HDC, &u8, C.HBRUSH)
 fn C.LoadCursorW(C.HINSTANCE, int) C.HCURSOR
 fn C.LoadIconW(C.HINSTANCE, int) C.HICON
 fn C.RegisterShellHookWindow(C.HWND) bool
 fn C.RegisterWindowMessageW(&u8) u32
 fn C.SetWindowLongPtr(C.HWND, int, &u8)
+fn C.SetWindowLong(C.HWND, int, int)
 fn C.EnumWindows(fn (C.HWND, &core.State) int, &u8) int
 fn C.GetParent(C.HWND) C.HWND
 fn C.GetWindowText(C.HWND, &u8, int)
@@ -164,3 +170,15 @@ fn C.GetForegroundWindow() C.HWND
 fn C.SetActiveWindow(C.HWND) C.HWND
 fn C.Shell_NotifyIconW(int, &u8) int
 fn C.Shell_NotifyIconA(int, &u8) int
+fn C.SetWindowPos(C.HWND, C.HWND, int, int, int, int, u32)
+// fn C.RGB(int, int, int) C.COLORREF
+fn C.SetClassLongPtr(C.HWND, u32, &u8)
+fn C.SetClassLong(C.HWND, u32, &u8)
+fn C.CreateSolidBrush(int) C.HBRUSH
+fn C.GetClientRect(C.HWND, &u8)
+fn C.UpdateWindow(C.HWND)
+fn C.RedrawWindow(C.HWND, &u8, u32, u32) int
+fn C.TextOutA(C.HDC, int, int, &u8, int) int
+fn C.SetBkColor(C.HDC, int) C.COLORREF
+fn C.SetTextColor(C.HDC, int) C.COLORREF
+fn C.DrawTextA(C.HDC, &u8, int, &u8, int) int

@@ -2,6 +2,8 @@ module app
 
 import core
 import rand
+import winapi
+import builtin.wchar
 
 fn get_monitor_by_win(hwnd C.HWND, state &core.State) !core.Monitor {
 	monitor := C.MonitorFromWindow(hwnd, C.MONITOR_DEFAULTTONEAREST)
@@ -110,4 +112,50 @@ fn toggle_disabled(state &core.State) {
 		state.render_grid()
 		core.debug('ENABLE A3wm')
 	}
+}
+
+
+pub fn fill_color(hwnd C.HWND, state &core.State) {
+	ps := winapi.PaintStruct{}
+	brush := C.CreateSolidBrush(state.topbar_bgcolor)
+	C.GetClientRect(hwnd, &ps);
+	hdc := C.BeginPaint(hwnd, &ps)
+	C.FillRect(hdc, &ps.rcPaint, brush)
+	C.SetBkColor(hdc, state.topbar_bgcolor)
+	print_text(hdc, 'A3 Window Manager', 10, 2)
+	monitor := get_monitor(state) or { return }
+	w := button(state, 'Reset', monitor.width - 250, 5)
+	button(state, 'Disable', monitor.width - 250 - w, 5)
+	C.SetTextColor(hdc, state.topbar_txtcolor)
+	mut left := print_text(hdc, '${state.windows.len} windows', 10, 25)
+	left = print_text(hdc, '${state.grids.len} grids', left + 10, 25)
+	print_text(hdc, '${state.monitors.len} monitors',  left + 10, 25)
+
+	print_clock(hdc, monitor)
+	C.EndPaint(hwnd, &ps)
+}
+
+fn button(state &core.State, message string, x int , y int) int {
+	class :=wchar.from_string('BUTTON')
+	message0 :=wchar.from_string(message)
+	w := (message.len*10 + 20)
+	C.CreateWindow(class, message0, C.WS_TABSTOP | C.WS_VISIBLE | C.WS_CHILD | C.BS_DEFPUSHBUTTON, x-w,y,w,40, state.handler, unsafe {nil}, state.instance, unsafe {nil})
+	return w + 10
+}
+fn get_monitor(state &core.State) ?core.Rect {
+	for _, monitor in state.monitors {
+		if monitor.size.left == 0 {
+			return monitor.size
+		}
+	}
+	return none
+}
+fn print_clock(hdc C.HDC, monitor core.Rect) {
+	text := '18:19 03/01/2024'
+	C.SetTextColor(hdc, 0x00000000)
+	C.TextOutA(hdc, monitor.width - (text.len*10), 10, text.str, text.len);
+}
+fn print_text(hdc C.HDC, text string, x int, y int) int {
+	C.TextOutA(hdc, x, y, text.str, text.len);
+	return x + (text.len*10)
 }

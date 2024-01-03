@@ -11,22 +11,18 @@ fn window_proc(hwnd C.HWND, umsg int, wparam C.WPARAM, lparam C.HWND) C.LRESULT 
 			return C.LRESULT(0)
 		}
 		C.WM_PAINT {
-			ps := winapi.PaintStruct{}
-			hdc := C.BeginPaint(hwnd, &ps)
-			C.FillRect(hdc, &ps.rcPaint, winapi.Color.windowframe)
-			C.EndPaint(hwnd, &ps)
+			fill_color(hwnd, state)
 			return C.LRESULT(0)
 		}
 		winapi.wm_tray_icon {
 				match int(lparam) {
 					C.WM_LBUTTONUP {
-							println('left click')
+							toggle_disabled(state)
 					}
 					C.WM_RBUTTONUP {
-							toggle_disabled(state)
-							// println('Quit application')
-							// C.PostQuitMessage(0)
-							// return C.LRESULT(0)
+							println('Quit application')
+							C.PostQuitMessage(0)
+							return C.LRESULT(0)
 					}
 					else {}
 				}
@@ -35,6 +31,7 @@ fn window_proc(hwnd C.HWND, umsg int, wparam C.WPARAM, lparam C.HWND) C.LRESULT 
 			if state != unsafe { nil } && umsg == state.shellhookid {
 				match int(wparam) & 0x7fff {
 					C.HSHELL_WINDOWCREATED {
+						// fill_color(hwnd, state)
 						result := add_win(C.HWND(lparam), state) or {
 							false
 						}

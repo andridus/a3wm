@@ -1,5 +1,4 @@
 module winapi
-
 pub enum Color {
 	scrollbar
 	background

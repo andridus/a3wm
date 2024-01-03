@@ -321,7 +321,7 @@ pub fn (g Grid) is_same(pos int, str string) bool {
 		1 {
 			addrs := g.elem1.get_uuid() or { return false }
 			return addrs == str
-		}	
+		}
 		2 {
 			addrs := g.elem2.get_uuid() or { return false }
 			return addrs == str
@@ -381,7 +381,7 @@ pub fn (g &Grid) get_from_parent(state &State) &Grid {
 		GridAddress{
 			grid := state.get_grid_by_uuid(gid)
 			grid0 := grid.get_from_parent(state)
-			
+
 			if grid0.uuid != '' {
 				grid0
 			} else if grid.uuid != '' {
@@ -421,7 +421,7 @@ pub fn (g &Grid) parse_axis_with_pos(rect C.RECT, pos int, state &State) Action 
 			}
 			if pos == 1 {
 				delta_left := math.abs(g.rect.left -  rect.left)
-				// e o delta left for maior que 2 
+				// e o delta left for maior que 2
 				// entao atualiza o grid se existir
 				if delta_left > 2 && maybe_update_axis_and_rect(g.parent_grid, g.uuid, 1, rect, u8(axis), state) {
 					parent := g.get_from_parent(state)
@@ -429,18 +429,18 @@ pub fn (g &Grid) parse_axis_with_pos(rect C.RECT, pos int, state &State) Action 
 						g.set_width_by_axis(parent.rect.width,parent.axis)
 					}
 					return .drag_axis
-				} 
+				}
 				else {
 					right1 := rect.right - g.rect.left
 					axis = int(f32(right1) / total_width * 100.0)
 					g.maybe_update_grid_width_by_el(2, total_width, axis, state)
 				}
-				
+
 			} else if pos == 2 {
 				right1 := g.rect.left + g.rect.width
 				right2 := rect.right
 				delta_right := math.abs(right1 - right2)
-				// e o delta right for maior que 2 
+				// e o delta right for maior que 2
 				// entao atualiza o grid se existir
 				if delta_right > 2 && maybe_update_axis_and_rect(g.parent_grid, g.uuid, 2, rect, u8(axis), state) {
 					 parent := g.get_from_parent(state)
@@ -454,7 +454,7 @@ pub fn (g &Grid) parse_axis_with_pos(rect C.RECT, pos int, state &State) Action 
 					axis = int(f32(left1) / total_width * 100.0)
 					g.maybe_update_grid_width_by_el(1, total_width, axis, state)
 				}
-				
+
 			}
 
 		}
@@ -481,7 +481,7 @@ pub fn (g &Grid) parse_axis_with_pos(rect C.RECT, pos int, state &State) Action 
 pub fn (g &Grid) parse_axis(rect C.RECT, hwnd C.HWND, state &State) Action {
 	el := g.which_elem_position(hwnd.str())
 	if el <= 2 {
-		return g.parse_axis_with_pos(rect, el, state)	
+		return g.parse_axis_with_pos(rect, el, state)
 	} else {
 		debug('not found window')
 	}

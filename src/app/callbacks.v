@@ -23,10 +23,10 @@ fn get_monitor_callback(wmonitor C.HMONITOR, hdc C.HDC, rect &C.RECT, state &cor
 			height: monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top
 		}
 		workarea: core.Rect{
-			top: monitor_info.rcWork.top
+			top: monitor_info.rcWork.top + state0.get_topbar_size()
 			left: monitor_info.rcWork.left
 			width: monitor_info.rcWork.right - monitor_info.rcWork.left
-			height: monitor_info.rcWork.bottom - monitor_info.rcWork.top
+			height: monitor_info.rcWork.bottom - monitor_info.rcWork.top - state0.get_topbar_size()
 		}
 	}
 	state0.monitors[monitor.id] = monitor
