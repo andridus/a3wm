@@ -17,6 +17,20 @@ fn window_proc(hwnd C.HWND, umsg int, wparam C.WPARAM, lparam C.HWND) C.LRESULT 
 			C.EndPaint(hwnd, &ps)
 			return C.LRESULT(0)
 		}
+		winapi.wm_tray_icon {
+				match int(lparam) {
+					C.WM_LBUTTONUP {
+							println('left click')
+					}
+					C.WM_RBUTTONUP {
+							toggle_disabled(state)
+							// println('Quit application')
+							// C.PostQuitMessage(0)
+							// return C.LRESULT(0)
+					}
+					else {}
+				}
+		}
 		else {
 			if state != unsafe { nil } && umsg == state.shellhookid {
 				match int(wparam) & 0x7fff {
@@ -26,13 +40,13 @@ fn window_proc(hwnd C.HWND, umsg int, wparam C.WPARAM, lparam C.HWND) C.LRESULT 
 						}
 						if result {
 							state.update_render_grid()
-							render_grid(state)
+							state.render_grid()
 						}
 					}
 					C.HSHELL_WINDOWDESTROYED {
 						if remove_win(C.HWND(lparam), state) {
 							state.update_render_grid()
-							render_grid(state)
+							state.render_grid()
 						}
 					}
 					else {}

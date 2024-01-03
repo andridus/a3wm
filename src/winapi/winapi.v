@@ -6,6 +6,18 @@ type C.WPARAM = u32
 type C.LPARAM = u32
 
 @[typedef]
+pub struct C.NOTIFYICONDATAA{
+		cbSize u32
+		hWnd C.HWND
+		uID int
+		uFlags int
+		uCallbackMessage int
+		hIcon C.HICON
+		szInfoTitle &u8 = unsafe {nil}
+		szTip &u8 = unsafe {nil}
+	}
+
+@[typedef]
 pub struct C.RECT {
 	top    int
 	left   int
@@ -98,6 +110,8 @@ pub struct C.POINT {
 	y u32
 }
 
+pub const wm_tray_icon = C.WM_USER + 1
+
 fn C.GetCursorPos(&C.POINT) u8
 fn C.MessageBoxA(&u8, &u8, &u8, int) int
 fn C.CreateWindowExW(u8, &u8, &u8, u32, int, int, int, int, C.HWND, &u8, C.HINSTANCE, &u8) C.HWND
@@ -148,3 +162,5 @@ fn C.UnhookWinEvent(C.HWINEVENTHOOK)
 // fn C.GetActiveWindow() C.HWND
 fn C.GetForegroundWindow() C.HWND
 fn C.SetActiveWindow(C.HWND) C.HWND
+fn C.Shell_NotifyIconW(int, &u8) int
+fn C.Shell_NotifyIconA(int, &u8) int

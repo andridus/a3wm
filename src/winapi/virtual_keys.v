@@ -44,6 +44,8 @@ pub enum Key {
 	mod_alt      = 0x0001
 	mod_control  = 0x0002
 	mod_shift    = 0x0003
+	mod_alt_shift  = 0x0005
+	mod_control_shift  = 0x0006
 	mod_win      = 0x0008
 	mod_norepeat = 0x4000
 
@@ -96,6 +98,8 @@ fn (k Key) str() string {
 		.mod_shift { 'SHIFT' }
 		.mod_win { 'SUPER' }
 		.mod_norepeat { 'NOREPEAT' }
+		.mod_control_shift { 'CTRL+SHIFT' }
+		.mod_alt_shift { 'ALT+SHIFT' }
 
 	}
 }

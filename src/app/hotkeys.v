@@ -16,6 +16,9 @@ fn register_hotkeys() {
 	register_one_hotkey(6, winapi.Key.mod_alt , winapi.Key.key_up, 'move to top window')
 	register_one_hotkey(7, winapi.Key.mod_alt , winapi.Key.key_right, 'move to right window')
 	register_one_hotkey(8, winapi.Key.mod_alt , winapi.Key.key_down, 'move to bottom window')
+	register_one_hotkey(9, winapi.Key.mod_control_shift  , winapi.Key.key_r, 'reset A3wm')
+	register_one_hotkey(10, winapi.Key.mod_control_shift  , winapi.Key.key_d, 'enable/disable A3wm')
+
 }
 
 fn map_hotkeys(msg &C.MSG, state &core.State) {
@@ -29,6 +32,9 @@ fn map_hotkeys(msg &C.MSG, state &core.State) {
 			6 { callback_move_to_top_window(state) }
 			7 { callback_move_to_right_window(state) }
 			8 { callback_move_to_bottom_window(state) }
+			9 { callback_reset_a3wm(state) }
+			10 { callback_disable_a3wm(state) }
+
 			else {}
 		}
 	}

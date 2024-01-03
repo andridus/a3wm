@@ -100,3 +100,14 @@ fn add_window_in_active_workarea(window core.Window, state &core.State, monitor 
 	state0.add_windows_reference(window, grid,  wk)
 	return true
 }
+
+fn toggle_disabled(state &core.State) {
+	state.toggle_disabled()
+	if state.disabled {
+		core.debug('DISABLE A3wm')
+	} else {
+		state.update_render_grid()
+		state.render_grid()
+		core.debug('ENABLE A3wm')
+	}
+}

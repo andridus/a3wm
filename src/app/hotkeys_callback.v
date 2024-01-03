@@ -13,12 +13,12 @@ fn callback_set_next_window_to_vertical(state &core.State) {
 }
 fn callback_toggle_grid_direction(state &core.State) {
 	state.toggle_grid_direction()
-	render_grid(state)
+	state.render_grid()
 	core.debug('ALT+t: toggle direction')
 }
 fn callback_fullscreen_window(state &core.State) {
 	state.set_window_to_fullscreen()
-	render_grid(state)
+	state.render_grid()
 	core.debug('ALT+f: fullscreen window')
 }
 fn callback_move_to_left_window(state &core.State) {
@@ -36,4 +36,14 @@ fn callback_move_to_bottom_window(state &core.State) {
 fn callback_move_to_right_window(state &core.State) {
 	// state.set_active_right_window() // TODO
 	core.debug('ALT+RIGHT: move to window bellow ')
+}
+fn callback_reset_a3wm(state &core.State) {
+	// state.set_active_right_window() // TODO
+	state.setup_state(state.handler, get_monitor_callback, window_watcher_callback)
+	state.render_grid()
+	core.debug('CTRL+SHIFT+r: reset a3wm')
+}
+fn callback_disable_a3wm(state &core.State) {
+	// state.set_active_right_window() // TODO
+	toggle_disabled(state)
 }
